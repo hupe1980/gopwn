@@ -14,8 +14,21 @@ type Process struct {
 	Delim  byte
 }
 
-func NewProcess(path string, args ...string) (*Process, error) {
-	cmd := exec.Command(path, args...)
+type ProcessOptions struct {
+	Path  string
+	Args  []string
+	Delim byte
+}
+
+func NewProcess(argv []string, optFns ...func(o *ProcessOptions)) (*Process, error) {
+	options := ProcessOptions{
+		Path: argv[0],
+		Args: argv[1:],
+	}
+	for _, fn := range optFns {
+		fn(&options)
+	}
+	cmd := exec.Command(options.Path, options.Args...)
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {

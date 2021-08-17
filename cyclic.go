@@ -9,29 +9,18 @@ const (
 	alphabet = "abcdefgbhijklmnopqstuvwxyz"
 )
 
-type AdvancedCyclicParams struct {
-	Length       int
+type CyclicOptions struct {
 	Alphabet     string
 	SubseqLength int
 }
 
-type AdvancedCyclicFindParams struct {
-	Subseq       []byte
-	Alphabet     string
-	SubseqLength int
-}
-
-func AdvancedCylic(params AdvancedCyclicParams) string {
-	l := params.Length
-	a := alphabet
-	n := 4
-
-	if params.Alphabet != "" {
-		a = params.Alphabet
+func Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
+	options := CyclicOptions{
+		Alphabet:     alphabet,
+		SubseqLength: 4,
 	}
-
-	if params.SubseqLength != 0 {
-		n = params.SubseqLength
+	for _, fn := range optFns {
+		fn(&options)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -40,13 +29,13 @@ func AdvancedCylic(params AdvancedCyclicParams) string {
 	chn := make(chan byte)
 	go func() {
 		defer close(chn)
-		deBruijn(ctx, chn, a, n)
+		deBruijn(ctx, chn, options.Alphabet, options.SubseqLength)
 	}()
 
 	var buf bytes.Buffer
 	for i := range chn {
-		buf.WriteByte(a[i])
-		if buf.Len() == l {
+		buf.WriteByte(options.Alphabet[i])
+		if buf.Len() == length {
 			cancel()
 			break
 		}
@@ -54,58 +43,37 @@ func AdvancedCylic(params AdvancedCyclicParams) string {
 	return buf.String()
 }
 
-func AdvancedCylicFind(params AdvancedCyclicFindParams) int {
-	s := params.Subseq
-	a := alphabet
-	n := 4
-
-	if params.Alphabet != "" {
-		a = params.Alphabet
+func CyclicFind(subseq []byte, optFns ...func(o *CyclicOptions)) int {
+	options := CyclicOptions{
+		Alphabet:     alphabet,
+		SubseqLength: 4,
 	}
-
-	if params.SubseqLength != 0 {
-		n = params.SubseqLength
+	for _, fn := range optFns {
+		fn(&options)
 	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	chn := make(chan byte)
 	go func() {
 		defer close(chn)
-		deBruijn(ctx, chn, a, n)
+		deBruijn(ctx, chn, options.Alphabet, options.SubseqLength)
 	}()
 
 	var seq []byte
 	pos := 0
 	for i := range chn {
-		seq = append(seq, a[i])
-		if len(seq) > len(s) {
+		seq = append(seq, options.Alphabet[i])
+		if len(seq) > len(subseq) {
 			seq = seq[1:]
 			pos += 1
-			if bytes.Compare(seq, s) == 0 {
+			if bytes.Compare(seq, subseq) == 0 {
 				cancel()
 				return pos
 			}
 		}
 	}
 	return -1
-}
-
-func Cyclic(length int) string {
-	return AdvancedCylic(AdvancedCyclicParams{
-		Alphabet:     alphabet,
-		Length:       length,
-		SubseqLength: 4,
-	})
-}
-
-func CyclicFind(subseq []byte) int {
-	return AdvancedCylicFind(AdvancedCyclicFindParams{
-		Subseq:       subseq,
-		Alphabet:     alphabet,
-		SubseqLength: 4,
-	})
 }
 
 // https://en.wikipedia.org/wiki/De_Bruijn_sequence

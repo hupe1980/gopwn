@@ -4,8 +4,8 @@ import (
 	"github.com/hupe1980/gopwn/tubes"
 )
 
-func Process(path string, args ...string) *tubes.Process {
-	p, err := tubes.NewProcess(path, args...)
+func Process(argv []string, optFns ...func(o *tubes.ProcessOptions)) *tubes.Process {
+	p, err := tubes.NewProcess(argv, optFns...)
 	if err != nil {
 		panic(err)
 	}

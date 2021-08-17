@@ -16,7 +16,7 @@ help: Makefile
 .PHONY: run
 ## run: Runs gopwn
 run: 
-	@go run cmd/*.go
+	@go run cmd/*.go cyclic create 25
 
 .PHONY: test
 ## test: Runs go test with default values

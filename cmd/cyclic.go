@@ -52,11 +52,11 @@ func newCyclicCreateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			pattern := gopwn.AdvancedCylic(gopwn.AdvancedCyclicParams{
-				Alphabet:     opts.alphabet,
-				SubseqLength: opts.subseqLength,
-				Length:       length,
+			pattern := gopwn.Cyclic(length, func(o *gopwn.CyclicOptions) {
+				o.Alphabet = opts.alphabet
+				o.SubseqLength = opts.subseqLength
 			})
+
 			fmt.Print(pattern)
 			return nil
 		},
