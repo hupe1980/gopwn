@@ -24,14 +24,13 @@ func newCyclicCmd() *cobra.Command {
 	return cmd
 }
 
-type cyclicCreateOptions struct {
-	length       int
-	alphabet     string
-	subseqLength int
+type cyclicOptions struct {
+	alphabet         string
+	distSubseqLength int
 }
 
 func newCyclicCreateCmd() *cobra.Command {
-	opts := &cyclicCreateOptions{}
+	opts := &cyclicOptions{}
 	cmd := &cobra.Command{
 		Use: "create [length]",
 		Args: func(cmd *cobra.Command, args []string) error {
@@ -54,7 +53,7 @@ func newCyclicCreateCmd() *cobra.Command {
 			}
 			pattern := gopwn.Cyclic(length, func(o *gopwn.CyclicOptions) {
 				o.Alphabet = opts.alphabet
-				o.SubseqLength = opts.subseqLength
+				o.DistSubseqLength = opts.distSubseqLength
 			})
 
 			fmt.Print(pattern)
@@ -62,22 +61,38 @@ func newCyclicCreateCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&opts.alphabet, "alphabet", "a", "abcdefghijklmnopqrstuvwxyz", "alphabet to use in the cyclic pattern (optional)")
-	cmd.Flags().IntVarP(&opts.subseqLength, "subseq", "n", 4, "size of the unique subsequences (optional)")
+	cmd.Flags().IntVarP(&opts.distSubseqLength, "dslength", "n", 4, "size of the unique subsequences (optional)")
 
 	return cmd
 }
 
 func newCyclicFinderCmd() *cobra.Command {
+	opts := &cyclicOptions{}
 	cmd := &cobra.Command{
-		Use:           "find",
+		Use: "find [subseq]",
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return errors.New("requires a subseq argument")
+			}
+			return nil
+		},
 		Short:         "Cyclic finder",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		Example:       "gopwn cyclic find",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			subseq := args[0]
+			offset := gopwn.CyclicFind([]byte(subseq), func(o *gopwn.CyclicOptions) {
+				o.Alphabet = opts.alphabet
+				o.DistSubseqLength = opts.distSubseqLength
+			})
+
+			fmt.Print(offset)
 			return nil
 		},
 	}
+	cmd.Flags().StringVarP(&opts.alphabet, "alphabet", "a", "abcdefghijklmnopqrstuvwxyz", "alphabet to use in the cyclic pattern (optional)")
+	cmd.Flags().IntVarP(&opts.distSubseqLength, "dslength", "n", 4, "size of the unique subsequences (optional)")
 
 	return cmd
 }

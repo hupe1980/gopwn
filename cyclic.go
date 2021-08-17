@@ -6,19 +6,19 @@ import (
 )
 
 const (
-	alphabet     = "abcdefgbhijklmnopqstuvwxyz"
-	subseqLength = 4
+	alphabet         = "abcdefgbhijklmnopqstuvwxyz"
+	distSubseqLength = 4
 )
 
 type CyclicOptions struct {
-	Alphabet     string
-	SubseqLength int
+	Alphabet         string
+	DistSubseqLength int
 }
 
 func Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
 	options := CyclicOptions{
-		Alphabet:     alphabet,
-		SubseqLength: subseqLength,
+		Alphabet:         alphabet,
+		DistSubseqLength: distSubseqLength,
 	}
 	for _, fn := range optFns {
 		fn(&options)
@@ -30,7 +30,7 @@ func Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
 	chn := make(chan byte)
 	go func() {
 		defer close(chn)
-		deBruijn(ctx, chn, options.Alphabet, options.SubseqLength)
+		deBruijn(ctx, chn, options.Alphabet, options.DistSubseqLength)
 	}()
 
 	var buf bytes.Buffer
@@ -46,19 +46,30 @@ func Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
 
 func CyclicFind(subseq []byte, optFns ...func(o *CyclicOptions)) int {
 	options := CyclicOptions{
-		Alphabet:     alphabet,
-		SubseqLength: subseqLength,
+		Alphabet:         alphabet,
+		DistSubseqLength: distSubseqLength,
 	}
 	for _, fn := range optFns {
 		fn(&options)
 	}
+
+	if len(subseq) > options.DistSubseqLength {
+		subseq = subseq[:options.DistSubseqLength]
+	}
+
+	for _, c := range subseq {
+		if !bytes.Contains([]byte(options.Alphabet), []byte{c}) {
+			return -1
+		}
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	chn := make(chan byte)
 	go func() {
 		defer close(chn)
-		deBruijn(ctx, chn, options.Alphabet, options.SubseqLength)
+		deBruijn(ctx, chn, options.Alphabet, options.DistSubseqLength)
 	}()
 
 	var seq []byte
