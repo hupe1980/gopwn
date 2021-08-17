@@ -15,4 +15,6 @@
 # vendor/
 
 .vagrant
-dist
+dist/
+completions/
+.DS_Store
