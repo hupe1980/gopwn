@@ -79,7 +79,7 @@ func CyclicFind(subseq []byte, optFns ...func(o *CyclicOptions)) int {
 		if len(seq) > len(subseq) {
 			seq = seq[1:]
 			pos += 1
-			if bytes.Compare(seq, subseq) == 0 {
+			if bytes.Equal(seq, subseq) {
 				cancel()
 				return pos
 			}

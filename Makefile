@@ -13,10 +13,24 @@ help: Makefile
 	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
 	@echo
 
+.PHONY: setup
+## setup: Setup installes dependencies
+setup:
+	@go mod tidy
+
 .PHONY: run
 ## run: Runs gopwn
 run: 
 	@go run cmd/*.go cyclic create 25
+
+.PHONY: build
+## build: Builds a beta version of gopwn
+build:
+	go build -o dist/
+
+.PHONY: ci
+## ci: Run all the tests and code checks
+ci: build test
 
 .PHONY: test
 ## test: Runs go test with default values

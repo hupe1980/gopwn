@@ -27,14 +27,14 @@ func NewELF(path string) (*ELF, error) {
 
 	fmt.Print(ef.Type)
 
-	e := &ELF{file: f, elf: ef}
+	e := &ELF{path: path, file: f, elf: ef}
 
 	var ident [elf.EI_NIDENT]byte
 	if _, err := e.file.Read(ident[:4]); err != nil {
 		return nil, err
 	}
 
-	if isElf(ident[:4]) == false {
+	if !isElf(ident[:4]) {
 		return nil, fmt.Errorf("Bad magic number at %d\n", ident[0:4])
 	}
 

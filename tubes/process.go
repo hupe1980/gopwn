@@ -1,29 +1,25 @@
 package tubes
 
 import (
-	"bufio"
-	"io"
 	"os/exec"
 )
 
 type Process struct {
-	cmd    *exec.Cmd
-	Stdin  io.WriteCloser
-	Stdout io.ReadCloser
-	Stderr io.ReadCloser
-	Delim  byte
+	tube
+	cmd *exec.Cmd
 }
 
 type ProcessOptions struct {
-	Path  string
-	Args  []string
-	Delim byte
+	Path    string
+	Args    []string
+	NewLine byte
 }
 
 func NewProcess(argv []string, optFns ...func(o *ProcessOptions)) (*Process, error) {
 	options := ProcessOptions{
-		Path: argv[0],
-		Args: argv[1:],
+		Path:    argv[0],
+		Args:    argv[1:],
+		NewLine: '\n',
 	}
 	for _, fn := range optFns {
 		fn(&options)
@@ -45,27 +41,16 @@ func NewProcess(argv []string, optFns ...func(o *ProcessOptions)) (*Process, err
 
 	return &Process{
 		cmd: cmd,
+		tube: tube{
+			stdin:  stdin,
+			stdout: stdout,
+			stderr: stderr,
 
-		Stdin:  stdin,
-		Stdout: stdout,
-		Stderr: stderr,
-
-		// Character sent with methods like SendLine() or used for RecvLine()
-		Delim: '\n',
+			newLine: options.NewLine,
+		},
 	}, nil
 }
 
 func (p *Process) Start() error {
 	return p.cmd.Start()
-}
-
-func (p *Process) SendLine(input interface{}) (int, error) {
-	b := Bytes(input)
-	b = append(b, p.Delim)
-	return p.Stdin.Write(b)
-}
-
-func (p *Process) RecvLine() ([]byte, error) {
-	rd := bufio.NewReader(p.Stdout)
-	return rd.ReadBytes(p.Delim)
 }
