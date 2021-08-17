@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	alphabet = "abcdefgbhijklmnopqstuvwxyz"
+	alphabet     = "abcdefgbhijklmnopqstuvwxyz"
+	subseqLength = 4
 )
 
 type CyclicOptions struct {
@@ -17,7 +18,7 @@ type CyclicOptions struct {
 func Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
 	options := CyclicOptions{
 		Alphabet:     alphabet,
-		SubseqLength: 4,
+		SubseqLength: subseqLength,
 	}
 	for _, fn := range optFns {
 		fn(&options)
@@ -46,7 +47,7 @@ func Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
 func CyclicFind(subseq []byte, optFns ...func(o *CyclicOptions)) int {
 	options := CyclicOptions{
 		Alphabet:     alphabet,
-		SubseqLength: 4,
+		SubseqLength: subseqLength,
 	}
 	for _, fn := range optFns {
 		fn(&options)
