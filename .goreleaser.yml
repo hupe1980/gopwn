@@ -5,7 +5,8 @@ before:
     - go mod tidy
     - ./scripts/completions.sh
 builds:
-  - env:
+  - main: cmd
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
