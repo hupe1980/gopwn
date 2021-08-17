@@ -8,7 +8,7 @@ import (
 )
 
 func (p *Process) CWD() string {
-	cwd, err := os.Readlink(fmt.Sprintf("/proc/%d/cwd", p.Cmd.Process.Pid))
+	cwd, err := os.Readlink(fmt.Sprintf("/proc/%d/cwd", p.cmd.Process.Pid))
 	if err != nil {
 		panic(err)
 	}
