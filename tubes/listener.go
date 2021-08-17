@@ -5,7 +5,6 @@ import "net"
 type Listener struct {
 	tube
 	listener net.Listener
-	con      net.Conn
 }
 
 func NewListener(addr string) (*Listener, error) {
@@ -23,7 +22,11 @@ func (l *Listener) WaitForConnection() error {
 	if err != nil {
 		return err
 	}
-	l.con = c
+	l.tube = tube{
+		stdin:  c,
+		stdout: c,
+		stderr: c,
+	}
 	return nil
 }
 

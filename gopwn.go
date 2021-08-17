@@ -14,3 +14,19 @@ func Process(argv []string, optFns ...func(o *tubes.ProcessOptions)) *tubes.Proc
 	}
 	return p
 }
+
+func Remotee(addr string) *tubes.Remote {
+	r, err := tubes.NewRemote(addr)
+	if err != nil {
+		panic(err)
+	}
+	return r
+}
+
+func Listen(addr string) *tubes.Listener {
+	l, err := tubes.NewListener(addr)
+	if err != nil {
+		panic(err)
+	}
+	return l
+}
