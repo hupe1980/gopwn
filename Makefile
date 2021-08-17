@@ -26,7 +26,7 @@ run:
 .PHONY: build
 ## build: Builds a beta version of gopwn
 build:
-	go build -o dist/
+	go build -o dist/gopwn cmd/*.go
 
 .PHONY: ci
 ## ci: Run all the tests and code checks
