@@ -25,8 +25,6 @@ func NewELF(path string) (*ELF, error) {
 		return nil, err
 	}
 
-	fmt.Print(ef.Type)
-
 	e := &ELF{path: path, file: f, elf: ef}
 
 	var ident [elf.EI_NIDENT]byte
@@ -48,6 +46,10 @@ func NewELF(path string) (*ELF, error) {
 	}
 
 	return e, nil
+}
+
+func (e *ELF) GOT() {
+
 }
 
 func (e *ELF) Close() error {
