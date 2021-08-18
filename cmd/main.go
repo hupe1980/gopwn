@@ -21,6 +21,7 @@ func newRootCmd(version string) *cobra.Command {
 	}
 	cmd.AddCommand(
 		newCyclicCmd(),
+		newChecksecCmd(),
 		newCompletionCmd(),
 	)
 	return cmd

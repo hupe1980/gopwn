@@ -1,61 +1,78 @@
 package gopwn
 
 import (
-	"bytes"
 	"debug/elf"
 	"fmt"
-	"os"
+	"strings"
+	"text/tabwriter"
+
+	"github.com/fatih/color"
 )
 
 type ELF struct {
-	path  string // Path to the file
-	file  *os.File
-	elf   *elf.File
-	bits  int
-	bytes int
+	path    string // Path to the file
+	file    *elf.File
+	symbols []elf.Symbol
 }
 
 func NewELF(path string) (*ELF, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	ef, err := elf.NewFile(f)
+	f, err := elf.Open(path)
 	if err != nil {
 		return nil, err
 	}
 
-	e := &ELF{path: path, file: f, elf: ef}
+	symbols, _ := f.Symbols()
 
-	var ident [elf.EI_NIDENT]byte
-	if _, err := e.file.Read(ident[:4]); err != nil {
-		return nil, err
-	}
-
-	if !isElf(ident[:4]) {
-		return nil, fmt.Errorf("Bad magic number at %d\n", ident[0:4])
-	}
-
-	switch ef.Class {
-	case elf.ELFCLASS64:
-		e.bits = 64
-		e.bytes = e.bits / 8
-	case elf.ELFCLASS32:
-		e.bits = 32
-		e.bytes = e.bits / 8
-	}
-
-	return e, nil
+	return &ELF{
+		path:    path,
+		file:    f,
+		symbols: symbols,
+	}, nil
 }
 
-func (e *ELF) GOT() {
+// Canary checks whether the current binary is using stack canaries
+func (e *ELF) Canary() bool {
+	for _, symbol := range e.symbols {
+		if symbol.Name == "__stack_chk_fail" {
+			return true
+		}
+	}
+	return false
+}
 
+// NX checks whether the current binary uses NX protections
+func (e *ELF) NX() bool {
+	for _, prog := range e.file.Progs {
+		if uint32(prog.Type) == uint32(0x6474e551) { // PT_GNU_STACK
+			if (uint32(prog.Flags) & uint32(elf.PF_X)) == 0 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (e *ELF) Checksec() string {
+	nx := map[bool]string{
+		true:  color.GreenString("NX enabled"),
+		false: color.RedString("NX disabled"),
+	}
+	stack := map[bool]string{
+		true:  color.GreenString("Canary found"),
+		false: color.RedString("No canary found"),
+	}
+
+	var builder strings.Builder
+	writer := tabwriter.NewWriter(&builder, 0, 0, 3, ' ', 0)
+
+	fmt.Fprintf(writer, "NX\t%s\n", nx[e.NX()])
+	fmt.Fprintf(writer, "Stack\t%s\n", stack[e.Canary()])
+
+	writer.Flush()
+
+	return builder.String()
 }
 
 func (e *ELF) Close() error {
 	return e.file.Close()
-}
-
-func isElf(magic []byte) bool {
-	return bytes.HasPrefix(magic, []byte{'\x7f', 'E', 'L', 'F'})
 }

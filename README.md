@@ -5,6 +5,44 @@ This module is strictly for educational purposes only. Usage of the methods and 
 
 :warning: This is experimental and subject to breaking changes.
 
+## How to use
+```go
+package main
+
+import (
+	"bytes"
+	"fmt"
+
+	"github.com/hupe1980/gopwn"
+)
+
+func main() {
+	p, _ := gopwn.Process([]string{"/binary"})
+	p.SendLine(append(bytes.Repeat([]byte("A"), 200), P32L(0xdeadbeef)...))
+	out, _ := p.RecvLine()
+	fmt.Println(string(out))
+}
+```
+
+## CLI
+```bash
+gopwn command-line interface
+
+Usage:
+  gopwn [command]
+
+Available Commands:
+  checksec    Check binary security settings
+  completion  Prints shell autocompletion scripts for gopwn
+  cyclic      Generation of unique sequences
+  help        Help about any command
+
+Flags:
+  -h, --help      help for gopwn
+  -v, --version   version for gopwn
+
+Use "gopwn [command] --help" for more information about a command.
+```
 ## Examples
 
 See more complete [examples](https://github.com/hupe1980/exploit-exercises/tree/main/exploits/go).

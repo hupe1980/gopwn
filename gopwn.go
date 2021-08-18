@@ -4,29 +4,21 @@ import (
 	"github.com/hupe1980/gopwn/tubes"
 )
 
-func Process(argv []string, optFns ...func(o *tubes.ProcessOptions)) *tubes.Process {
+func Process(argv []string, optFns ...func(o *tubes.ProcessOptions)) (*tubes.Process, error) {
 	p, err := tubes.NewProcess(argv, optFns...)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	if err := p.Start(); err != nil {
-		panic(err)
+		return nil, err
 	}
-	return p
+	return p, nil
 }
 
-func Remotee(addr string) *tubes.Remote {
-	r, err := tubes.NewRemote(addr)
-	if err != nil {
-		panic(err)
-	}
-	return r
+func Remotee(addr string) (*tubes.Remote, error) {
+	return tubes.NewRemote(addr)
 }
 
-func Listen(addr string) *tubes.Listener {
-	l, err := tubes.NewListener(addr)
-	if err != nil {
-		panic(err)
-	}
-	return l
+func Listen(addr string) (*tubes.Listener, error) {
+	return tubes.NewListener(addr)
 }
