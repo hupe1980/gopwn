@@ -21,7 +21,7 @@ setup:
 .PHONY: run
 ## run: Runs gopwn
 run: 
-	@go run cmd/*.go cyclic create 25
+	@go run $$(ls -1 cmd/*.go | grep -v _test.go) cyclic create 10
 
 .PHONY: build
 ## build: Builds a beta version of gopwn
