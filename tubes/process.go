@@ -1,7 +1,6 @@
 package tubes
 
 import (
-	"io"
 	"os"
 	"os/exec"
 )
@@ -56,15 +55,6 @@ func NewProcess(argv []string, optFns ...func(o *ProcessOptions)) (*Process, err
 // Start starts the specified command but does not wait for it to complete.
 func (p *Process) Start() error {
 	return p.cmd.Start()
-}
-
-func (p Process) Interactive() error {
-	go io.Copy(p.tube.stdin, os.Stdin)
-	go io.Copy(os.Stdout, p.tube.stdout)
-	go io.Copy(os.Stderr, p.tube.stderr)
-
-	// Wait for the process to exit
-	return p.cmd.Wait()
 }
 
 // Kill causes the Process to exit immediately. Kill does not wait until
