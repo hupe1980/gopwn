@@ -5,5 +5,9 @@ This module is strictly for educational purposes only. Usage of the methods and 
 
 :warning: This is experimental and subject to breaking changes.
 
+## Examples
+
+See more complete [examples](https://github.com/hupe1980/exploit-exercises/tree/main/exploits/go).
+
 ## License
 [MIT](LICENCE)
