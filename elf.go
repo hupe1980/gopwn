@@ -52,6 +52,11 @@ func (e *ELF) NX() bool {
 	return false
 }
 
+// PIE checks whether the current binary is position-independent
+func (e *ELF) PIE() bool {
+	return e.file.Type == elf.ET_DYN
+}
+
 func (e *ELF) Checksec() string {
 	nx := map[bool]string{
 		true:  color.GreenString("NX enabled"),
@@ -61,12 +66,17 @@ func (e *ELF) Checksec() string {
 		true:  color.GreenString("Canary found"),
 		false: color.RedString("No canary found"),
 	}
+	pie := map[bool]string{
+		true:  color.GreenString("PIE enabled"),
+		false: color.RedString("No PIE"),
+	}
 
 	var builder strings.Builder
 	writer := tabwriter.NewWriter(&builder, 0, 0, 3, ' ', 0)
 
-	fmt.Fprintf(writer, "NX\t%s\n", nx[e.NX()])
-	fmt.Fprintf(writer, "Stack\t%s\n", stack[e.Canary()])
+	fmt.Fprintf(writer, "NX:\t%s\n", nx[e.NX()])
+	fmt.Fprintf(writer, "Stack:\t%s\n", stack[e.Canary()])
+	fmt.Fprintf(writer, "PIE:\t%s\n", pie[e.PIE()])
 
 	writer.Flush()
 
