@@ -5,7 +5,7 @@ import "github.com/spf13/cobra"
 func newCompletionCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                   "completion [bash|zsh|fish]",
-		Short:                 "Prints shell autocompletion scripts for gotoaws",
+		Short:                 "Prints shell autocompletion scripts for gopwn",
 		SilenceUsage:          true,
 		DisableFlagsInUseLine: true,
 		ValidArgs:             []string{"bash", "zsh", "fish"},
