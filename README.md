@@ -18,7 +18,7 @@ import (
 
 func main() {
 	p, _ := gopwn.Process([]string{"/binary"})
-	p.SendLine(append(bytes.Repeat([]byte("A"), 200), P32L(0xdeadbeef)...))
+	p.SendLine(append(bytes.Repeat([]byte("A"), 200), gopwn.P32L(0xdeadbeef)...))
 	out, _ := p.RecvLine()
 	fmt.Println(string(out))
 }
