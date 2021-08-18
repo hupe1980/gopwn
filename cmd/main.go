@@ -16,8 +16,7 @@ func newRootCmd(version string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "gopwn",
 		Version:       version,
-		Short:         "",
-		Long:          "",
+		Short:         "gopwn command-line interface",
 		SilenceErrors: true,
 	}
 	cmd.AddCommand(
