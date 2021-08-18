@@ -79,7 +79,7 @@ func newCyclicFinderCmd() *cobra.Command {
 		Short:         "Cyclic finder",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		Example:       "gopwn cyclic find",
+		Example:       "gopwn cyclic find aabb",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			subseq := args[0]
 			offset := gopwn.CyclicFind([]byte(subseq), func(o *gopwn.CyclicOptions) {
