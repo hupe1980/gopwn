@@ -43,3 +43,19 @@ changelog:
       - Merge pull request
       - Merge branch
       - go mod tidy
+nfpms:
+  - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    homepage:  https://github.com/hupe1980/gopwn
+    description: gopwn command-line interface
+    license: MIT
+    contents:
+      - src: ./completions/gotoaws.bash
+        dst: /etc/bash_completion.d/gotoaws
+      - src: ./completions/gotoaws.fish
+        dst: /usr/share/fish/completions/gotoaws.fish
+      - src: ./completions/gotoaws.zsh
+        dst: /usr/local/share/zsh/site-functions/_gotoaws
+    formats:
+    - apk
+    - deb
+    - rpm
