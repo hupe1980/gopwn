@@ -3,9 +3,6 @@
 package tubes
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/shirou/gopsutil/v3/process"
 )
 
