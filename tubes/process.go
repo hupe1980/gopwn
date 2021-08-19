@@ -57,6 +57,11 @@ func (p *Process) Start() error {
 	return p.cmd.Start()
 }
 
+// PID returns the pid of the process.
+func (p *Process) PID() int {
+	return p.cmd.Process.Pid
+}
+
 // Kill causes the Process to exit immediately. Kill does not wait until
 // the Process has actually exited. This only kills the Process itself,
 // not any other processes it may have started.

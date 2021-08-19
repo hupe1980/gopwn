@@ -1,6 +1,9 @@
+// +build linux freebsd openbsd darwin solaris
+
 package tubes
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,7 +19,7 @@ func TestProcess(t *testing.T) {
 
 		out, err := p.RecvLine()
 		assert.NoError(t, err)
-		assert.Equal(t, []byte("helloworld\n"), out)
+		assert.Equal(t, []byte("helloworld"), out)
 	})
 
 	t.Run("sh", func(t *testing.T) {
@@ -31,7 +34,7 @@ func TestProcess(t *testing.T) {
 
 		out, err := p.RecvLine()
 		assert.NoError(t, err)
-		assert.Equal(t, []byte("helloworld\n"), out)
+		assert.Equal(t, []byte("helloworld"), out)
 	})
 
 	t.Run("env", func(t *testing.T) {
@@ -48,6 +51,28 @@ func TestProcess(t *testing.T) {
 
 		out, err := p.RecvLine()
 		assert.NoError(t, err)
-		assert.Equal(t, []byte("helloworld\n"), out)
+		assert.Equal(t, []byte("helloworld"), out)
+	})
+
+	t.Run("cwd", func(t *testing.T) {
+		dir, _ := filepath.Abs("../testdata")
+		p, err := NewProcess([]string{"sh"}, func(o *ProcessOptions) {
+			o.Dir = dir
+		})
+		assert.NoError(t, err)
+
+		err = p.Start()
+		assert.NoError(t, err)
+
+		_, err = p.SendLine("cd .. && pwd")
+		assert.NoError(t, err)
+
+		out, err := p.RecvLine()
+		assert.NoError(t, err)
+		assert.Equal(t, "gopwn", filepath.Base(string(out)))
+
+		cwd, err := p.CWD()
+		assert.NoError(t, err)
+		assert.Equal(t, "gopwn", filepath.Base(cwd))
 	})
 }

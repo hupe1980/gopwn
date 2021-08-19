@@ -5,7 +5,7 @@ This module is strictly for educational purposes only. Usage of the methods and 
 
 :warning: This is experimental and subject to breaking changes.
 
-## How to use
+## Usage
 ```go
 package main
 
@@ -23,6 +23,9 @@ func main() {
 	fmt.Println(string(out))
 }
 ```
+
+### Documentation
+see http://godoc.org/github.com/hupe1980/gopwn
 
 ## CLI
 ```bash

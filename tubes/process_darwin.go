@@ -1,4 +1,5 @@
 // +build darwin
+// +build cgo
 
 package tubes
 
@@ -20,8 +21,8 @@ import (
 	"C"
 )
 
-func (p *Process) CWD() string {
+func (p *Process) CWD() (string, error) {
 	var cRetValue *C.char
 	cRetValue = C.getwd(C.int(p.cmd.Process.Pid), cRetValue)
-	return C.GoString(cRetValue)
+	return C.GoString(cRetValue), nil
 }

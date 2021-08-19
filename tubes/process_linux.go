@@ -5,12 +5,14 @@ package tubes
 import (
 	"fmt"
 	"os"
+
+	"github.com/shirou/gopsutil/v3/process"
 )
 
-func (p *Process) CWD() string {
-	cwd, err := os.Readlink(fmt.Sprintf("/proc/%d/cwd", p.cmd.Process.Pid))
+func (p *Process) CWD() (string, error) {
+	process, err := process.NewProcess(int32(p.cmd.Process.Pid))
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return cwd
+	return process.Cwd()
 }

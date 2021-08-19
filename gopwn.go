@@ -15,8 +15,8 @@ func Process(argv []string, optFns ...func(o *tubes.ProcessOptions)) (*tubes.Pro
 	return p, nil
 }
 
-func Remotee(addr string) (*tubes.Remote, error) {
-	return tubes.NewRemote(addr)
+func Remote(network, addr string) (*tubes.Remote, error) {
+	return tubes.NewRemote(network, addr)
 }
 
 func Listen(addr string) (*tubes.Listener, error) {

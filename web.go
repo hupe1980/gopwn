@@ -11,15 +11,14 @@ import (
 )
 
 type HTTPClientOptions struct {
-	Timeout       time.Duration
-	ProxyURL      string
-	SkipTLSVerify bool
+	Timeout         time.Duration
+	ProxyURL        string
+	TLSClientConfig *tls.Config
 }
 
 func HTTPGet(url string, optFns ...func(o *HTTPClientOptions)) ([]byte, error) {
 	options := HTTPClientOptions{
-		Timeout:       5 * time.Second,
-		SkipTLSVerify: false,
+		Timeout: 5 * time.Second,
 	}
 	for _, fn := range optFns {
 		fn(&options)
@@ -41,8 +40,7 @@ func HTTPGet(url string, optFns ...func(o *HTTPClientOptions)) ([]byte, error) {
 
 func Download(url, filename string, optFns ...func(o *HTTPClientOptions)) error {
 	options := HTTPClientOptions{
-		Timeout:       10 * time.Second,
-		SkipTLSVerify: false,
+		Timeout: 10 * time.Second,
 	}
 	for _, fn := range optFns {
 		fn(&options)
@@ -71,7 +69,7 @@ func Download(url, filename string, optFns ...func(o *HTTPClientOptions)) error 
 
 func newHTTPClient(options HTTPClientOptions) *http.Client {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: options.SkipTLSVerify}
+	transport.TLSClientConfig = options.TLSClientConfig
 
 	if options.ProxyURL != "" {
 		proxyURL, _ := url.Parse(options.ProxyURL)
