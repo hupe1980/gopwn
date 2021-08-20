@@ -1,4 +1,4 @@
-package bins
+package gopwn
 
 import (
 	"debug/macho"

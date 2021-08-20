@@ -1,8 +1,7 @@
-package bins
+package gopwn
 
 import (
 	"debug/elf"
-	"errors"
 	"fmt"
 	"strings"
 	"text/tabwriter"
@@ -14,6 +13,7 @@ type ELF struct {
 	path    string // Path to the file
 	file    *elf.File
 	arch    Arch
+	endian  Endian
 	symbols []elf.Symbol
 }
 
@@ -36,19 +36,34 @@ func NewELF(path string) (*ELF, error) {
 	case elf.EM_AARCH64:
 		arch = ARCH_AARCH64
 	default:
-		return nil, errors.New("Unsupported machine type.")
+		return nil, fmt.Errorf("Unsupported machine type %x.", f.Machine)
+	}
+
+	var endian Endian
+	switch f.Data {
+	case elf.ELFDATA2LSB:
+		endian = LITTLE_ENDIAN
+	case elf.ELFDATA2MSB:
+		endian = BIG_ENDIAN
+	default:
+		return nil, fmt.Errorf("Unknown endianness %x.", f.Data)
 	}
 
 	return &ELF{
 		path:    path,
 		file:    f,
 		arch:    arch,
+		endian:  endian,
 		symbols: symbols,
 	}, nil
 }
 
 func (e *ELF) Architecture() Arch {
 	return e.arch
+}
+
+func (e *ELF) Endianness() Endian {
+	return e.endian
 }
 
 // Canary checks whether the current binary is using stack canaries

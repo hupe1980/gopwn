@@ -1,4 +1,4 @@
-package bins
+package gopwn
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 
 func TestELF(t *testing.T) {
 	t.Run("i386", func(t *testing.T) {
-		elf, err := NewELF("../testdata/elf.i386")
+		elf, err := NewELF("testdata/elf.i386")
 		assert.NoError(t, err)
 		defer elf.Close()
 
@@ -16,7 +16,7 @@ func TestELF(t *testing.T) {
 	})
 
 	t.Run("x86_64", func(t *testing.T) {
-		elf, err := NewELF("../testdata/elf.x86_64")
+		elf, err := NewELF("testdata/elf.x86_64")
 		assert.NoError(t, err)
 		defer elf.Close()
 

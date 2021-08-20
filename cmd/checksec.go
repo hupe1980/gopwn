@@ -22,7 +22,7 @@ func newChecksecCmd() *cobra.Command {
 		SilenceErrors: true,
 		Example:       "gopwn checksec /usr/bin/ping",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			elf, err := gopwn.ELF(args[0])
+			elf, err := gopwn.NewELF(args[0])
 			if err != nil {
 				return err
 			}
