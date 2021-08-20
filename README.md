@@ -34,7 +34,10 @@ assert.Equal(t, uint32(0xdeadbeef), i) // true
 ```
 
 ### Documentation
-see http://godoc.org/github.com/hupe1980/gopwn
+See http://godoc.org/github.com/hupe1980/gopwn
+
+### Examples
+See more complete [examples](https://github.com/hupe1980/exploit-exercises/tree/main/exploits/go).
 
 ## CLI
 ```bash
@@ -55,9 +58,15 @@ Flags:
 
 Use "gopwn [command] --help" for more information about a command.
 ```
-## Examples
 
-See more complete [examples](https://github.com/hupe1980/exploit-exercises/tree/main/exploits/go).
+### Installing
+You can install the pre-compiled binary in several different ways
+
+#### deb/rpm/apk:
+Download the .deb, .rpm or .apk from the [releases page](https://github.com/hupe1980/gopwn/releases) and install them with the appropriate tools.
+
+#### manually:
+Download the pre-compiled binaries from the [releases page](https://github.com/hupe1980/gopwn/releases) and copy to the desired location.
 
 ## License
 [MIT](LICENCE)
