@@ -1,4 +1,4 @@
-package gopwn
+package bins
 
 import (
 	"debug/pe"

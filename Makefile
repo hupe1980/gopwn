@@ -21,7 +21,7 @@ setup:
 .PHONY: run
 ## run: Runs gopwn
 run: 
-	@go run $$(ls -1 cmd/*.go | grep -v _test.go) checksec testdata/cat
+	@go run $$(ls -1 cmd/*.go | grep -v _test.go) checksec testdata/elf.i386
 
 .PHONY: build
 ## build: Builds a beta version of gopwn

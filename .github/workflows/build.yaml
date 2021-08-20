@@ -15,7 +15,16 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-
+      
+      - name: Install missing dependencies
+        run: sudo apt-get install gcc gcc-multilib g++-multilib
+      
+      - name: Install capstone
+        run: sudo ./scripts/install_capstone.sh
+      
+      - name: Install keystone
+        run: sudo ./scripts/install_keystone  
+      
       - name: Set up Go ${{ matrix.node-version }}
         uses: actions/setup-go@v2
         with:
@@ -28,6 +37,7 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+      
       - name: Run Setup
         run: make setup
       

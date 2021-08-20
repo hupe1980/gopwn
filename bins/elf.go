@@ -1,7 +1,8 @@
-package gopwn
+package bins
 
 import (
 	"debug/elf"
+	"errors"
 	"fmt"
 	"strings"
 	"text/tabwriter"
@@ -12,6 +13,7 @@ import (
 type ELF struct {
 	path    string // Path to the file
 	file    *elf.File
+	arch    Arch
 	symbols []elf.Symbol
 }
 
@@ -23,11 +25,30 @@ func NewELF(path string) (*ELF, error) {
 
 	symbols, _ := f.Symbols()
 
+	var arch Arch
+	switch f.Machine {
+	case elf.EM_386:
+		arch = ARCH_I386
+	case elf.EM_X86_64:
+		arch = ARCH_X86_64
+	case elf.EM_ARM:
+		arch = ARCH_ARM
+	case elf.EM_AARCH64:
+		arch = ARCH_AARCH64
+	default:
+		return nil, errors.New("Unsupported machine type.")
+	}
+
 	return &ELF{
 		path:    path,
 		file:    f,
+		arch:    arch,
 		symbols: symbols,
 	}, nil
+}
+
+func (e *ELF) Architecture() Arch {
+	return e.arch
 }
 
 // Canary checks whether the current binary is using stack canaries
@@ -77,6 +98,13 @@ func (e *ELF) Checksec() string {
 	fmt.Fprintf(writer, "NX:\t%s\n", nx[e.NX()])
 	fmt.Fprintf(writer, "Stack:\t%s\n", stack[e.Canary()])
 	fmt.Fprintf(writer, "PIE:\t%s\n", pie[e.PIE()])
+
+	symbols := color.GreenString("No Symbols")
+	sl := len(e.symbols)
+	if sl > 0 {
+		symbols = color.RedString(fmt.Sprintf("%d Symbols", sl))
+	}
+	fmt.Fprintf(writer, "Symbols:\t%s\n", symbols)
 
 	writer.Flush()
 

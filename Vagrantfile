@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
   #   vb.gui = true
   #
   #   # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    vb.memory = "4096"
     vb.name = "gopwn"
 
   end
@@ -72,7 +72,13 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
     add-apt-repository ppa:longsleep/golang-backports
-    apt-get update
-    apt-get install make golang-go -y
+    apt-get update && apt-get upgrade -y
+    apt-get install golang-go make cmake gcc gcc-multilib g++-multilib gdb checksec -y
+
+    sh /home/vagrant/gopwn/scripts/install_capstone.sh
+    sh /home/vagrant/gopwn/scripts/install_keystone.sh
+
+    echo "/usr/local/lib" >> /etc/ld.so.conf
+    ldconfig
   SHELL
 end

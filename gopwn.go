@@ -1,6 +1,7 @@
 package gopwn
 
 import (
+	"github.com/hupe1980/gopwn/bins"
 	"github.com/hupe1980/gopwn/tubes"
 )
 
@@ -21,4 +22,16 @@ func Remote(network, addr string) (*tubes.Remote, error) {
 
 func Listen(addr string) (*tubes.Listener, error) {
 	return tubes.NewListener(addr)
+}
+
+func ELF(path string) (*bins.ELF, error) {
+	return bins.NewELF(path)
+}
+
+func PE(path string) (*bins.PE, error) {
+	return bins.NewPE(path)
+}
+
+func MACHO(path string) (*bins.MACHO, error) {
+	return bins.NewMACHO(path)
 }
