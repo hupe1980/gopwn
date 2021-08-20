@@ -24,6 +24,15 @@ func main() {
 }
 ```
 
+### Packing Integers
+```go
+//32Bit LittelEndian
+b := P32L(0xdeadbeef)
+assert.Equal(t, []byte("\xef\xbe\xad\xde"), b) // true
+i := U32L([]byte("\xef\xbe\xad\xde"))
+assert.Equal(t, uint32(0xdeadbeef), i) // true
+```
+
 ### Documentation
 see http://godoc.org/github.com/hupe1980/gopwn
 
