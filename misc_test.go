@@ -44,3 +44,26 @@ func TestROT13(t *testing.T) {
 	r := ROT13(s)
 	assert.Equal(t, ROT13(s), r)
 }
+
+func TestOpenFile(t *testing.T) {
+	t.Run("ELF I386", func(t *testing.T) {
+		fh, bt, err := OpenFile("testdata/elf.i386")
+		assert.NoError(t, err)
+		defer fh.Close()
+		assert.Equal(t, BINTYPE_ELF, bt)
+	})
+
+	t.Run("ELF IX86_64", func(t *testing.T) {
+		fh, bt, err := OpenFile("testdata/elf.x86_64")
+		assert.NoError(t, err)
+		defer fh.Close()
+		assert.Equal(t, BINTYPE_ELF, bt)
+	})
+
+	t.Run("MACHO", func(t *testing.T) {
+		fh, bt, err := OpenFile("testdata/macho.x86_64")
+		assert.NoError(t, err)
+		defer fh.Close()
+		assert.Equal(t, BINTYPE_MACHO, bt)
+	})
+}

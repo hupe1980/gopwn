@@ -36,6 +36,25 @@ func (a Endian) String() string {
 	return endianString[a]
 }
 
+type Bintype int
+
+const (
+	BINTYPE_UNKNOWN Bintype = iota
+	BINTYPE_ELF
+	BINTYPE_PE
+	BINTYPE_MACHO
+)
+
+func (b Bintype) String() string {
+	bintypeString := map[Bintype]string{
+		0: "Unknown",
+		1: "ELF",
+		2: "PE",
+		3: "MACH-O",
+	}
+	return bintypeString[b]
+}
+
 func NewProcess(argv []string, optFns ...func(o *tube.ProcessOptions)) (*tube.Process, error) {
 	return tube.NewProcess(argv, optFns...)
 }

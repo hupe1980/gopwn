@@ -24,12 +24,12 @@ func TestDISASM(t *testing.T) {
 	t.Run("x86_64", func(t *testing.T) {
 		assembly, err := DisamX86_64([]byte("\x48\xc7\xc0\x17\x00\x00\x00"), 0)
 		assert.NoError(t, err)
-		assert.Equal(t, "0x0:\tmov\t\trax, 0x17\n", assembly)
+		assert.Equal(t, "0x0           48 c7 c0 17 00 00 00          mov rax, 0x17", assembly)
 	})
 
 	t.Run("i386", func(t *testing.T) {
 		assembly, err := DisamI386([]byte("\xb8\x5d\x00\x00\x00"), 0)
 		assert.NoError(t, err)
-		assert.Equal(t, "0x0:\tmov\t\teax, 0x5d\n", assembly)
+		assert.Equal(t, "0x0           b8 5d 00 00 00                mov eax, 0x5d", assembly)
 	})
 }

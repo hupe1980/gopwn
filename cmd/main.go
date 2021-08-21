@@ -20,6 +20,7 @@ func newRootCmd(version string) *cobra.Command {
 		SilenceErrors: true,
 	}
 	cmd.AddCommand(
+		newCaveCmd(),
 		newCyclicCmd(),
 		newChecksecCmd(),
 		newCompletionCmd(),

@@ -1,18 +1,32 @@
 package gopwn
 
 import (
+	"bytes"
 	"debug/pe"
 	"fmt"
+	"os"
 )
 
 type PE struct {
-	path string // Path to the file
 	file *pe.File
 	arch Arch
 }
 
 func NewPE(path string) (*PE, error) {
-	f, err := pe.Open(path)
+	fh, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	return NewPEFromReader(fh)
+}
+
+func NewPEFromBytes(b []byte) (*PE, error) {
+	r := bytes.NewReader(b)
+	return NewPEFromReader(r)
+}
+
+func NewPEFromReader(r BinaryReader) (*PE, error) {
+	f, err := pe.NewFile(r)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +46,6 @@ func NewPE(path string) (*PE, error) {
 	}
 
 	return &PE{
-		path: path,
 		file: f,
 		arch: arch,
 	}, nil
@@ -40,4 +53,22 @@ func NewPE(path string) (*PE, error) {
 
 func (p *PE) Close() error {
 	return p.file.Close()
+}
+
+func (p *PE) Caves(caveSize int) []Cave {
+	var caves []Cave
+	for _, s := range p.file.Sections {
+		body, _ := s.Data()
+		// If the Size is greater than the VirtualSize the difference will
+		// be filled with Zeros, so this space is an code cave
+		if s.Size > s.VirtualSize {
+			body = append(body, bytes.Repeat([]byte("\x00"), int(s.Size-s.VirtualSize))...)
+		}
+		caves = append(caves, searchCaves(s.Name, body, uint64(s.Offset), uint64(s.VirtualAddress), parsePeCharacteristics(s.Characteristics), caveSize)...)
+	}
+	return caves
+}
+
+func parsePeCharacteristics(c uint32) string {
+	return "TODO"
 }

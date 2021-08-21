@@ -106,8 +106,11 @@ func (d *Disassembler) Disam(data []byte, vma uint64) (string, error) {
 		return "", err
 	}
 	var output string
-	for _, insn := range insns {
-		output += fmt.Sprintf("0x%x:\t%s\t\t%s\n", insn.Address, insn.Mnemonic, insn.OpStr)
+	for i, insn := range insns {
+		output += fmt.Sprintf("0x%-12x% -30x%s %s", insn.Address, insn.Bytes, insn.Mnemonic, insn.OpStr)
+		if i < (len(insns) - 1) {
+			output += "\n"
+		}
 	}
 	return output, nil
 }

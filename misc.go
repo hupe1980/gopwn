@@ -1,8 +1,10 @@
 package gopwn
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/hex"
+	"os"
 	"strings"
 )
 
@@ -54,4 +56,29 @@ func ROT13(s string) string {
 		}
 		return c
 	}, s)
+}
+
+func OpenFile(path string) (*os.File, Bintype, error) {
+	fh, err := os.Open(path)
+	if err != nil {
+		return nil, BINTYPE_UNKNOWN, err
+	}
+
+	var ident = make([]byte, 4)
+	if _, err := fh.ReadAt(ident[0:], 0); err != nil {
+		return nil, BINTYPE_UNKNOWN, err
+	}
+
+	var binType Bintype
+	if bytes.HasPrefix(ident, []byte("\x7FELF")) {
+		binType = BINTYPE_ELF
+	} else if bytes.HasPrefix(ident, []byte("MZ")) {
+		binType = BINTYPE_PE
+	} else if bytes.HasPrefix(ident, P32L(0xfeedfacf)) {
+		binType = BINTYPE_MACHO
+	} else {
+		binType = BINTYPE_UNKNOWN
+	}
+
+	return fh, binType, nil
 }

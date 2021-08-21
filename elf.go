@@ -1,8 +1,13 @@
 package gopwn
 
 import (
+	"bytes"
 	"debug/elf"
+	"encoding/binary"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
 	"strings"
 	"text/tabwriter"
 
@@ -10,15 +15,29 @@ import (
 )
 
 type ELF struct {
-	path    string // Path to the file
 	file    *elf.File
+	hdr     interface{} // elf.Header32 or elf.Header64
 	arch    Arch
 	endian  Endian
 	symbols []elf.Symbol
+	raw     []byte
 }
 
 func NewELF(path string) (*ELF, error) {
-	f, err := elf.Open(path)
+	fh, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	return NewELFFromReader(fh)
+}
+
+func NewELFFromBytes(b []byte) (*ELF, error) {
+	r := bytes.NewReader(b)
+	return NewELFFromReader(r)
+}
+
+func NewELFFromReader(r BinaryReader) (*ELF, error) {
+	f, err := elf.NewFile(r)
 	if err != nil {
 		return nil, err
 	}
@@ -49,13 +68,62 @@ func NewELF(path string) (*ELF, error) {
 		return nil, fmt.Errorf("Unknown endianness %x.", f.Data)
 	}
 
+	if _, err := r.Seek(0, io.SeekStart); err != nil {
+		return nil, err
+	}
+	var hdr interface{}
+	switch f.Class {
+	case elf.ELFCLASS32:
+		hdr = new(elf.Header32)
+		if err := binary.Read(r, f.ByteOrder, hdr); err != nil {
+			return nil, err
+		}
+	case elf.ELFCLASS64:
+		hdr = new(elf.Header64)
+		if err := binary.Read(r, f.ByteOrder, hdr); err != nil {
+			return nil, err
+		}
+	}
+
+	rawData, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ELF{
-		path:    path,
 		file:    f,
+		hdr:     hdr,
 		arch:    arch,
 		endian:  endian,
 		symbols: symbols,
+		raw:     rawData,
 	}, nil
+}
+
+// Address determines the virtual address for the specified file offset
+func (e *ELF) Address(offset uint64) (uint64, error) {
+	for _, p := range e.file.Progs {
+		start := p.Off
+		end := p.Off + p.Filesz
+
+		if offset >= start && offset < end {
+			return offset - p.Off + p.Vaddr, nil
+		}
+	}
+	return 0, fmt.Errorf("Offset %x is not in range of an ELF segment", offset)
+}
+
+// Offset determines the offset for the specified virtual address
+func (e *ELF) Offset(address uint64) (uint64, error) {
+	for _, p := range e.file.Progs {
+		start := p.Vaddr
+		end := p.Vaddr + p.Filesz
+
+		if address >= start && address < end {
+			return address - p.Vaddr + p.Off, nil
+		}
+	}
+	return 0, fmt.Errorf("Address %x is not in range of an ELF segment", address)
 }
 
 func (e *ELF) Architecture() Arch {
@@ -128,4 +196,59 @@ func (e *ELF) Checksec() string {
 
 func (e *ELF) Close() error {
 	return e.file.Close()
+}
+
+func (e *ELF) DumpHeader(hdr interface{}) {
+	fmt.Println("-------------------------- Elf Header ------------------------")
+	switch e.file.Class {
+	case elf.ELFCLASS64:
+		h := e.hdr.(elf.Header64)
+		fmt.Printf("Magic: % x\n", h.Ident)
+		fmt.Printf("Class: %s\n", elf.Class(h.Ident[elf.EI_CLASS]))
+		fmt.Printf("Data: %s\n", elf.Data(h.Ident[elf.EI_DATA]))
+		fmt.Printf("Version: %s\n", elf.Version(h.Version))
+		fmt.Printf("OS/ABI: %s\n", elf.OSABI(h.Ident[elf.EI_OSABI]))
+		fmt.Printf("ABI Version: %d\n", h.Ident[elf.EI_ABIVERSION])
+		fmt.Printf("Elf Type: %s\n", elf.Type(h.Type))
+		fmt.Printf("Machine: %s\n", elf.Machine(h.Machine))
+		fmt.Printf("Entry: 0x%x\n", h.Entry)
+		fmt.Printf("Program Header Offset: 0x%x\n", h.Phoff)
+		fmt.Printf("Section Header Offset: 0x%x\n", h.Shoff)
+		fmt.Printf("Flags: 0x%x\n", h.Flags)
+		fmt.Printf("Elf Header Size (bytes): %d\n", h.Ehsize)
+		fmt.Printf("Program Header Entry Size (bytes): %d\n", h.Phentsize)
+		fmt.Printf("Number of Program Header Entries: %d\n", h.Phnum)
+		fmt.Printf("Size of Section Header Entry: %d\n", h.Shentsize)
+		fmt.Printf("Number of Section Header Entries: %d\n", h.Shnum)
+		fmt.Printf("Index of Section Header string table: %d\n", h.Shstrndx)
+	case elf.ELFCLASS32:
+		h := e.hdr.(elf.Header32)
+		fmt.Printf("Magic: % x\n", h.Ident)
+		fmt.Printf("Class: %s\n", elf.Class(h.Ident[elf.EI_CLASS]))
+		fmt.Printf("Data: %s\n", elf.Data(h.Ident[elf.EI_DATA]))
+		fmt.Printf("Version: %s\n", elf.Version(h.Version))
+		fmt.Printf("OS/ABI: %s\n", elf.OSABI(h.Ident[elf.EI_OSABI]))
+		fmt.Printf("ABI Version: %d\n", h.Ident[elf.EI_ABIVERSION])
+		fmt.Printf("Elf Type: %s\n", elf.Type(h.Type))
+		fmt.Printf("Machine: %s\n", elf.Machine(h.Machine))
+		fmt.Printf("Entry: 0x%x\n", h.Entry)
+		fmt.Printf("Program Header Offset: 0x%x\n", h.Phoff)
+		fmt.Printf("Section Header Offset: 0x%x\n", h.Shoff)
+		fmt.Printf("Flags: 0x%x\n", h.Flags)
+		fmt.Printf("Elf Header Size (bytes): %d\n", h.Ehsize)
+		fmt.Printf("Program Header Entry Size (bytes): %d\n", h.Phentsize)
+		fmt.Printf("Number of Program Header Entries: %d\n", h.Phnum)
+		fmt.Printf("Size of Section Header Entry: %d\n", h.Shentsize)
+		fmt.Printf("Number of Section Header Entries: %d\n", h.Shnum)
+		fmt.Printf("Index of Section Header string table: %d\n", h.Shstrndx)
+	}
+}
+
+func (e *ELF) Caves(caveSize int) []Cave {
+	var caves []Cave
+	for _, s := range e.file.Sections {
+		body, _ := s.Data()
+		caves = append(caves, searchCaves(s.Name, body, s.Offset, s.Addr, s.Flags.String(), caveSize)...)
+	}
+	return caves
 }
