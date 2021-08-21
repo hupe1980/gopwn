@@ -1,7 +1,7 @@
 // +build darwin
 // +build cgo
 
-package tubes
+package tube
 
 /*
 #include <libproc.h>

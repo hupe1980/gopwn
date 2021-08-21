@@ -1,4 +1,4 @@
-package tubes
+package tube
 
 import (
 	"os"
@@ -40,6 +40,9 @@ func NewProcess(argv []string, optFns ...func(o *ProcessOptions)) (*Process, err
 	if err != nil {
 		return nil, err
 	}
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
 
 	return &Process{
 		cmd: cmd,
@@ -50,11 +53,6 @@ func NewProcess(argv []string, optFns ...func(o *ProcessOptions)) (*Process, err
 			newLine: options.NewLine,
 		},
 	}, nil
-}
-
-// Start starts the specified command but does not wait for it to complete.
-func (p *Process) Start() error {
-	return p.cmd.Start()
 }
 
 // PID returns the pid of the process.

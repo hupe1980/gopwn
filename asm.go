@@ -62,11 +62,11 @@ func Assemble(assembly string, arch Arch) ([]byte, error) {
 	return ks.Assemble(assembly)
 }
 
-func Assemble_X86_64(assembly string) ([]byte, error) {
+func AssembleX86_64(assembly string) ([]byte, error) {
 	return Assemble(assembly, ARCH_X86_64)
 }
 
-func Assemble_I386(assembly string) ([]byte, error) {
+func AssembleI386(assembly string) ([]byte, error) {
 	return Assemble(assembly, ARCH_I386)
 }
 
@@ -126,10 +126,10 @@ func Disam(data []byte, vma uint64, arch Arch) (string, error) {
 	return engine.Disam(data, vma)
 }
 
-func Disam_X86_64(data []byte, vma uint64) (string, error) {
+func DisamX86_64(data []byte, vma uint64) (string, error) {
 	return Disam(data, vma, ARCH_X86_64)
 }
 
-func Disam_I386(data []byte, vma uint64) (string, error) {
+func DisamI386(data []byte, vma uint64) (string, error) {
 	return Disam(data, vma, ARCH_I386)
 }

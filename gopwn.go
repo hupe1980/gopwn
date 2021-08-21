@@ -1,8 +1,6 @@
 package gopwn
 
-import (
-	"github.com/hupe1980/gopwn/tubes"
-)
+import "github.com/hupe1980/gopwn/tube"
 
 type Arch int
 
@@ -18,7 +16,7 @@ func (a Arch) String() string {
 		0: "x86_64",
 		1: "i386",
 		2: "arm",
-		3: "arm_64",
+		3: "aarch64",
 	}
 	return archString[a]
 }
@@ -38,21 +36,14 @@ func (a Endian) String() string {
 	return endianString[a]
 }
 
-func NewProcess(argv []string, optFns ...func(o *tubes.ProcessOptions)) (*tubes.Process, error) {
-	p, err := tubes.NewProcess(argv, optFns...)
-	if err != nil {
-		return nil, err
-	}
-	if err := p.Start(); err != nil {
-		return nil, err
-	}
-	return p, nil
+func NewProcess(argv []string, optFns ...func(o *tube.ProcessOptions)) (*tube.Process, error) {
+	return tube.NewProcess(argv, optFns...)
 }
 
-func NewRemote(network, addr string) (*tubes.Remote, error) {
-	return tubes.NewRemote(network, addr)
+func NewRemote(network, addr string) (*tube.Remote, error) {
+	return tube.NewRemote(network, addr)
 }
 
-func NewListener(addr string) (*tubes.Listener, error) {
-	return tubes.NewListener(addr)
+func NewListener(addr string) (*tube.Listener, error) {
+	return tube.NewListener(addr)
 }

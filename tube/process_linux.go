@@ -1,6 +1,6 @@
 // +build linux
 
-package tubes
+package tube
 
 import (
 	"github.com/shirou/gopsutil/v3/process"

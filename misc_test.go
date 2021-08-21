@@ -27,3 +27,20 @@ func TestUnhexString(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, []byte("ABCD"), b)
 }
+
+func TestBase64E(t *testing.T) {
+	s := Base64E([]byte("ABCD"))
+	assert.Equal(t, "QUJDRA==", s)
+}
+
+func TestBase64D(t *testing.T) {
+	b, err := Base64D("QUJDRA==")
+	assert.NoError(t, err)
+	assert.Equal(t, []byte("ABCD"), b)
+}
+
+func TestROT13(t *testing.T) {
+	s := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	r := ROT13(s)
+	assert.Equal(t, ROT13(s), r)
+}

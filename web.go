@@ -14,6 +14,9 @@ type HTTPClientOptions struct {
 	Timeout         time.Duration
 	ProxyURL        string
 	TLSClientConfig *tls.Config
+	Cookie          *http.Cookie
+	Headers         map[string]string
+	UserAgent       string
 }
 
 func HTTPGet(url string, optFns ...func(o *HTTPClientOptions)) ([]byte, error) {
@@ -24,8 +27,12 @@ func HTTPGet(url string, optFns ...func(o *HTTPClientOptions)) ([]byte, error) {
 		fn(&options)
 	}
 	client := newHTTPClient(options)
+	req, err := newHTTPRequest("GET", url, options)
+	if err != nil {
+		return nil, err
+	}
 
-	res, err := client.Get(url)
+	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +53,12 @@ func Download(url, filename string, optFns ...func(o *HTTPClientOptions)) error 
 		fn(&options)
 	}
 	client := newHTTPClient(options)
+	req, err := newHTTPRequest("GET", url, options)
+	if err != nil {
+		return err
+	}
 
-	res, err := client.Get(url)
+	res, err := client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -80,4 +91,23 @@ func newHTTPClient(options HTTPClientOptions) *http.Client {
 		Timeout:   options.Timeout,
 		Transport: transport,
 	}
+}
+
+func newHTTPRequest(method, url string, options HTTPClientOptions) (*http.Request, error) {
+	r, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	if options.Cookie != nil {
+		r.AddCookie(options.Cookie)
+	}
+	if options.UserAgent != "" {
+		r.Header.Set("User-Agent", options.UserAgent)
+	}
+	if len(options.Headers) > 0 {
+		for k, v := range options.Headers {
+			r.Header.Set(k, v)
+		}
+	}
+	return r, nil
 }

@@ -1,4 +1,4 @@
-package tubes
+package tube
 
 import "net"
 
