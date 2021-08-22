@@ -20,7 +20,7 @@ type ELF struct {
 	arch    Arch
 	endian  Endian
 	symbols []elf.Symbol
-	raw     []byte
+	fileBytes
 }
 
 func NewELF(path string) (*ELF, error) {
@@ -96,7 +96,20 @@ func NewELFFromReader(r BinaryReader) (*ELF, error) {
 		arch:    arch,
 		endian:  endian,
 		symbols: symbols,
-		raw:     rawData,
+		fileBytes: fileBytes{
+			raw: rawData,
+			addrToOffset: func(addr uint64) (uint64, error) {
+				for _, p := range f.Progs {
+					start := p.Vaddr
+					end := p.Vaddr + p.Filesz
+
+					if addr >= start && addr < end {
+						return addr - p.Vaddr + p.Off, nil
+					}
+				}
+				return 0, fmt.Errorf("Address %x is not in range of an ELF segment", addr)
+			},
+		},
 	}, nil
 }
 
@@ -114,16 +127,8 @@ func (e *ELF) Address(offset uint64) (uint64, error) {
 }
 
 // Offset determines the offset for the specified virtual address
-func (e *ELF) Offset(address uint64) (uint64, error) {
-	for _, p := range e.file.Progs {
-		start := p.Vaddr
-		end := p.Vaddr + p.Filesz
-
-		if address >= start && address < end {
-			return address - p.Vaddr + p.Off, nil
-		}
-	}
-	return 0, fmt.Errorf("Address %x is not in range of an ELF segment", address)
+func (e *ELF) Offset(addr uint64) (uint64, error) {
+	return e.addrToOffset(addr)
 }
 
 func (e *ELF) Architecture() Arch {
