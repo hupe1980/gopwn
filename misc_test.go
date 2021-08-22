@@ -58,15 +58,15 @@ func TestOpenFile(t *testing.T) {
 		assert.Equal(t, BINTYPE_ELF, bt)
 	})
 
-	t.Run("ELF IX86_64", func(t *testing.T) {
-		fh, bt, err := OpenFile("testdata/elf.x86_64")
+	t.Run("ELF AMD64", func(t *testing.T) {
+		fh, bt, err := OpenFile("testdata/elf.amd64")
 		assert.NoError(t, err)
 		defer fh.Close()
 		assert.Equal(t, BINTYPE_ELF, bt)
 	})
 
 	t.Run("MACHO", func(t *testing.T) {
-		fh, bt, err := OpenFile("testdata/macho.x86_64")
+		fh, bt, err := OpenFile("testdata/macho.amd64")
 		assert.NoError(t, err)
 		defer fh.Close()
 		assert.Equal(t, BINTYPE_MACHO, bt)

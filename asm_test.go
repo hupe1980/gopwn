@@ -7,8 +7,8 @@ import (
 )
 
 func TestASM(t *testing.T) {
-	t.Run("x86_64", func(t *testing.T) {
-		insn, err := AssembleX86_64("mov rax, 0")
+	t.Run("amd64", func(t *testing.T) {
+		insn, err := AssembleAMD64("mov rax, 0")
 		assert.NoError(t, err)
 		assert.Equal(t, []byte("\x48\xc7\xc0\x00\x00\x00\x00"), insn)
 	})
@@ -21,8 +21,8 @@ func TestASM(t *testing.T) {
 }
 
 func TestDISASM(t *testing.T) {
-	t.Run("x86_64", func(t *testing.T) {
-		assembly, err := DisamX86_64([]byte("\x48\xc7\xc0\x17\x00\x00\x00"), 0)
+	t.Run("amd64", func(t *testing.T) {
+		assembly, err := DisamAMD64([]byte("\x48\xc7\xc0\x17\x00\x00\x00"), 0)
 		assert.NoError(t, err)
 		assert.Equal(t, "0x0           48 c7 c0 17 00 00 00          mov rax, 0x17", assembly)
 	})

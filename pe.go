@@ -36,7 +36,7 @@ func NewPEFromReader(r BinaryReader) (*PE, error) {
 	case pe.IMAGE_FILE_MACHINE_I386:
 		arch = ARCH_I386
 	case pe.IMAGE_FILE_MACHINE_AMD64:
-		arch = ARCH_X86_64
+		arch = ARCH_AMD64
 	case pe.IMAGE_FILE_MACHINE_ARM:
 		arch = ARCH_ARM
 	case pe.IMAGE_FILE_MACHINE_ARM64:

@@ -18,21 +18,21 @@ builds:
       - amd64
       - arm
       - arm64
-archives:
-  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-    format_overrides:
-      - goos: windows
-        format: zip
-    files:
-      - README.md
-      - LICENSE
-      - completions/*  
+# archives:
+#   - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+#     replacements:
+#       darwin: Darwin
+#       linux: Linux
+#       windows: Windows
+#       386: i386
+#       amd64: x86_64
+#     format_overrides:
+#       - goos: windows
+#         format: zip
+#     files:
+#       - README.md
+#       - LICENSE
+#       - completions/*  
 checksum:
   name_template: '{{ .ProjectName }}_checksums.txt'
 changelog:
@@ -44,19 +44,19 @@ changelog:
       - Merge pull request
       - Merge branch
       - go mod tidy
-nfpms:
-  - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    homepage:  https://github.com/hupe1980/gopwn
-    description: gopwn command-line interface
-    license: MIT
-    contents:
-      - src: ./completions/gopwn.bash
-        dst: /etc/bash_completion.d/gopwn
-      - src: ./completions/gopwn.fish
-        dst: /usr/share/fish/completions/gopwn.fish
-      - src: ./completions/gopwn.zsh
-        dst: /usr/local/share/zsh/site-functions/_gopwn
-    formats:
-    - apk
-    - deb
-    - rpm
+# nfpms:
+#   - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+#     homepage:  https://github.com/hupe1980/gopwn
+#     description: gopwn command-line interface
+#     license: MIT
+#     contents:
+#       - src: ./completions/gopwn.bash
+#         dst: /etc/bash_completion.d/gopwn
+#       - src: ./completions/gopwn.fish
+#         dst: /usr/share/fish/completions/gopwn.fish
+#       - src: ./completions/gopwn.zsh
+#         dst: /usr/local/share/zsh/site-functions/_gopwn
+#     formats:
+#     - apk
+#     - deb
+#     - rpm

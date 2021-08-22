@@ -15,12 +15,12 @@ func TestELF(t *testing.T) {
 		assert.Equal(t, ARCH_I386.String(), elf.Architecture().String())
 	})
 
-	t.Run("Open x86_64", func(t *testing.T) {
-		elf, err := NewELF("testdata/elf.x86_64")
+	t.Run("Open amd64", func(t *testing.T) {
+		elf, err := NewELF("testdata/elf.amd64")
 		assert.NoError(t, err)
 		defer elf.Close()
 
-		assert.Equal(t, ARCH_X86_64.String(), elf.Architecture().String())
+		assert.Equal(t, ARCH_AMD64.String(), elf.Architecture().String())
 	})
 
 	t.Run("Patch i386", func(t *testing.T) {

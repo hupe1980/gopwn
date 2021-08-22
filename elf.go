@@ -49,7 +49,7 @@ func NewELFFromReader(r BinaryReader) (*ELF, error) {
 	case elf.EM_386:
 		arch = ARCH_I386
 	case elf.EM_X86_64:
-		arch = ARCH_X86_64
+		arch = ARCH_AMD64
 	case elf.EM_ARM:
 		arch = ARCH_ARM
 	case elf.EM_AARCH64:

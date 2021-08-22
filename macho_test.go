@@ -7,7 +7,7 @@ import (
 )
 
 func TestMACHO(t *testing.T) {
-	macho, err := NewMACHO("testdata/macho.x86_64")
+	macho, err := NewMACHO("testdata/macho.amd64")
 	assert.NoError(t, err)
 	defer macho.Close()
 }

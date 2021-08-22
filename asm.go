@@ -17,7 +17,7 @@ func NewAssembler(arch Arch) (*Assembler, error) {
 	var err error
 
 	switch arch {
-	case ARCH_X86_64:
+	case ARCH_AMD64:
 		ks, err = keystone.New(keystone.ARCH_X86, keystone.MODE_64)
 	case ARCH_I386:
 		ks, err = keystone.New(keystone.ARCH_X86, keystone.MODE_32)
@@ -62,8 +62,8 @@ func Assemble(assembly string, arch Arch) ([]byte, error) {
 	return ks.Assemble(assembly)
 }
 
-func AssembleX86_64(assembly string) ([]byte, error) {
-	return Assemble(assembly, ARCH_X86_64)
+func AssembleAMD64(assembly string) ([]byte, error) {
+	return Assemble(assembly, ARCH_AMD64)
 }
 
 func AssembleI386(assembly string) ([]byte, error) {
@@ -76,13 +76,13 @@ type Disassembler struct {
 
 func NewDisassembler(arch Arch) (*Disassembler, error) {
 	archs := map[Arch]int{
-		ARCH_X86_64:  gapstone.CS_ARCH_X86,
+		ARCH_AMD64:   gapstone.CS_ARCH_X86,
 		ARCH_I386:    gapstone.CS_ARCH_X86,
 		ARCH_ARM:     gapstone.CS_ARCH_ARM,
 		ARCH_AARCH64: gapstone.CS_ARCH_ARM64,
 	}
 	modes := map[Arch]int{
-		ARCH_X86_64:  gapstone.CS_MODE_64,
+		ARCH_AMD64:   gapstone.CS_MODE_64,
 		ARCH_I386:    gapstone.CS_MODE_32,
 		ARCH_ARM:     gapstone.CS_MODE_ARM,
 		ARCH_AARCH64: gapstone.CS_MODE_ARM,
@@ -129,8 +129,8 @@ func Disam(data []byte, vma uint64, arch Arch) (string, error) {
 	return engine.Disam(data, vma)
 }
 
-func DisamX86_64(data []byte, vma uint64) (string, error) {
-	return Disam(data, vma, ARCH_X86_64)
+func DisamAMD64(data []byte, vma uint64) (string, error) {
+	return Disam(data, vma, ARCH_AMD64)
 }
 
 func DisamI386(data []byte, vma uint64) (string, error) {
