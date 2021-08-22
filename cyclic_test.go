@@ -11,7 +11,7 @@ func TestCycling(t *testing.T) {
 		l := 16
 		pattern := Cyclic(l)
 		assert.Equal(t, l, len(pattern))
-		assert.Equal(t, "aaaabaaacaaadaaa", pattern)
+		assert.Equal(t, []byte("aaaabaaacaaadaaa"), pattern)
 	})
 
 	t.Run("custom alphabet", func(t *testing.T) {
@@ -20,7 +20,7 @@ func TestCycling(t *testing.T) {
 			o.Alphabet = "XYZ"
 		})
 		assert.Equal(t, l, len(pattern))
-		assert.Equal(t, "XXXXYXXXZXXYYXXY", pattern)
+		assert.Equal(t, []byte("XXXXYXXXZXXYYXXY"), pattern)
 	})
 
 	t.Run("custom n", func(t *testing.T) {
@@ -29,7 +29,7 @@ func TestCycling(t *testing.T) {
 			o.DistSubseqLength = 2
 		})
 		assert.Equal(t, l, len(pattern))
-		assert.Equal(t, "aabacadaeafagaba", pattern)
+		assert.Equal(t, []byte("aabacadaeafagaba"), pattern)
 	})
 }
 

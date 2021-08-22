@@ -29,13 +29,41 @@ func main() {
 ### Packing Integers
 ```go
 //32Bit LittelEndian
-b := P32L(0xdeadbeef)
+b := gopwn.P32L(0xdeadbeef)
 assert.Equal(t, []byte("\xef\xbe\xad\xde"), b) // true
-i := U32L([]byte("\xef\xbe\xad\xde"))
+i := gopwn.U32L([]byte("\xef\xbe\xad\xde"))
 assert.Equal(t, uint32(0xdeadbeef), i) // true
 ```
 
 ### Assembly and Disassembly
+```go
+insn, _ := gopwn.AssembleI386("mov eax, 0")
+fmt.Println(gopwn.HexString(insn))
+```
+Outputs:
+```
+b800000000
+```
+```go
+assembly, _ := gopwn.DisamI386([]byte("\xb8\x5d\x00\x00\x00"), 0)
+fmt.Println(assembly)
+```
+Outputs:
+```
+0x0           b8 5d 00 00 00                mov eax, 0x5d
+```
+
+### Misc Tools
+Generate unique sequences to find offsets in your buffer causing a crash:
+```go
+assert.Equal(t, []byte("aaaabaaacaaadaaa"), gopwn.Cyclic(16)) // true
+assert.Equal(t, 4, gopwn.CyclicFind([]byte("baaa")) // true
+```
+
+### Binary Manipulation
+```go
+elf, _ := gopwn.NewELF("./ctfbinary")
+```
 
 ### Documentation
 See [godoc](https://pkg.go.dev/github.com/hupe1980/gopwn).
@@ -44,7 +72,7 @@ See [godoc](https://pkg.go.dev/github.com/hupe1980/gopwn).
 See more complete [examples](https://github.com/hupe1980/exploit-exercises/tree/main/exploits/go).
 
 ## CLI
-```bash
+```
 gopwn command-line interface
 
 Usage:

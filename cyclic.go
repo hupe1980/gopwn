@@ -15,7 +15,7 @@ type CyclicOptions struct {
 	DistSubseqLength int
 }
 
-func Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
+func Cyclic(length int, optFns ...func(o *CyclicOptions)) []byte {
 	options := CyclicOptions{
 		Alphabet:         alphabet,
 		DistSubseqLength: distSubseqLength,
@@ -41,7 +41,7 @@ func Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
 			break
 		}
 	}
-	return buf.String()
+	return buf.Bytes()
 }
 
 func CyclicFind(subseq []byte, optFns ...func(o *CyclicOptions)) int {

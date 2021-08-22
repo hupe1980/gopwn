@@ -61,7 +61,7 @@ func (e *env) Close() error {
 	return e.disassembler.Close()
 }
 
-func (e *env) Cyclic(length int, optFns ...func(o *CyclicOptions)) string {
+func (e *env) Cyclic(length int, optFns ...func(o *CyclicOptions)) []byte {
 	var envOpsFuncs []func(o *CyclicOptions)
 	envOpsFuncs = append(envOpsFuncs, func(o *CyclicOptions) { o = &e.cyclicOptions }) //nolint
 	envOpsFuncs = append(envOpsFuncs, optFns...)
