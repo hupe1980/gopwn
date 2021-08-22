@@ -152,8 +152,8 @@ func (e *ELF) Canary() bool {
 // NX checks whether the current binary uses NX protections
 func (e *ELF) NX() bool {
 	for _, prog := range e.file.Progs {
-		if uint32(prog.Type) == uint32(0x6474e551) { // PT_GNU_STACK
-			if (uint32(prog.Flags) & uint32(elf.PF_X)) == 0 {
+		if prog.Type == elf.PT_GNU_STACK {
+			if prog.Flags&elf.PF_X == 0 {
 				return true
 			}
 		}

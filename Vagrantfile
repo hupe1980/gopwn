@@ -75,10 +75,7 @@ Vagrant.configure("2") do |config|
     apt-get update && apt-get upgrade -y
     apt-get install golang-go make cmake gcc gcc-multilib g++-multilib gdb checksec -y
 
-    sh /home/vagrant/gopwn/scripts/install_capstone.sh
-    sh /home/vagrant/gopwn/scripts/install_keystone.sh
-
-    echo "/usr/local/lib" >> /etc/ld.so.conf
-    ldconfig
+    /home/vagrant/gopwn/scripts/install_capstone.sh
+    /home/vagrant/gopwn/scripts/install_keystone.sh
   SHELL
 end

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 CS_VERSION=4.0.2
 
@@ -12,4 +12,5 @@ cd ./capstone
 make
 make install
 
+cd $HOME
 rm -rf /tmp/capstone

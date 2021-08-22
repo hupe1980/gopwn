@@ -5,7 +5,8 @@ before:
     - go mod tidy
     - ./scripts/completions.sh
 builds:
-  - dir: cmd
+  - skip: true
+    dir: cmd
     env:
       - CGO_ENABLED=0
     goos:
