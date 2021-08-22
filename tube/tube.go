@@ -3,6 +3,8 @@ package tube
 import (
 	"bufio"
 	"bytes"
+	"context"
+	"fmt"
 	"io"
 )
 
@@ -30,14 +32,76 @@ func (t *tube) RecvN(n int) ([]byte, error) {
 	return b[:rn], nil
 }
 
-func (t *tube) RecvLine() ([]byte, error) {
-	rd := bufio.NewReader(t.stdout)
-	b, err := rd.ReadBytes(t.NewLine())
+// RecvUntil receives data until the specified sequence of bytes is detected.
+func (t *tube) RecvUntil(needle []byte, drop bool) ([]byte, error) {
+	return t.RecvUntilWithContext(context.Background(), needle, drop)
+}
+
+// RecvUntilWithContext receives data until the specified sequence of bytes is detected or the context is done.
+func (t *tube) RecvUntilWithContext(ctx context.Context, needle []byte, drop bool) ([]byte, error) {
+	data := make([]byte, len(needle))
+	b := bufio.NewReader(t.stdout)
+
+	_, err := io.ReadFull(b, data)
 	if err != nil {
 		return nil, err
 	}
-	b = bytes.TrimSuffix(b, []byte{t.NewLine()})
-	return b, nil
+
+	idx := 0
+	for {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		default:
+		}
+
+		if bytes.Equal(data[idx:idx+len(needle)], needle) {
+			if drop {
+				return data[0 : len(data)-len(needle)], nil
+			}
+			return data, nil
+		}
+
+		byt, err := b.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+
+		data = append(data, byt)
+		idx++
+	}
+}
+
+// RecvLine receives data until a newline delimiter is detected.
+func (t *tube) RecvLine() ([]byte, error) {
+	return t.RecvUntil([]byte{t.NewLine()}, true)
+}
+
+// Interactive allows the user to interact with the tube manually.
+func (t *tube) Interactive() error {
+	go func() {
+		for {
+			data, err := t.RecvN(1)
+			if err != nil {
+				break
+			}
+			fmt.Printf("%c", data[0])
+		}
+	}()
+
+	for {
+		var line string
+		fmt.Scanln(&line)
+		if line == "quit()" {
+			fmt.Println("Exiting interactive mode...")
+			return nil
+		}
+
+		_, err := t.SendLine([]byte(line))
+		if err != nil {
+			return err
+		}
+	}
 }
 
 func (t *tube) NewLine() byte {
@@ -49,7 +113,7 @@ func (t *tube) NewLine() byte {
 }
 
 // Bytes takes type interface{} and converts it to []byte, if it can't convert
-// to []byte it will panic
+// to []byte it will panic.
 func Bytes(t interface{}) []byte {
 	switch x := t.(type) {
 	case string:
@@ -61,6 +125,6 @@ func Bytes(t interface{}) []byte {
 	case rune:
 		return []byte(string(x))
 	default:
-		panic("failed to convert t to type []byte")
+		panic("Failed to convert t to type []byte")
 	}
 }
