@@ -2,6 +2,7 @@ package gopwn
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -53,6 +54,16 @@ type Cave struct {
 	Size        int
 	Addr        int
 	Infos       string
+}
+
+func (c *Cave) Dump() {
+	fmt.Println("\n[+] CAVE DETECTED!")
+	fmt.Printf("[!] Section Name: %s\n", c.SectionName)
+	fmt.Printf("[!] Section Flags: %s\n", c.Infos)
+	fmt.Printf("[!] Virtual Address: %#x\n", c.Addr)
+	fmt.Printf("[!] Cave Begin: %#x\n", c.Begin)
+	fmt.Printf("[!] Cave End: %#x\n", c.End)
+	fmt.Printf("[!] Cave Size: %#x (%d bytes)\n", c.Size, c.Size)
 }
 
 func searchCaves(name string, body []byte, offset, addr uint64, infos string, caveSize int) []Cave {

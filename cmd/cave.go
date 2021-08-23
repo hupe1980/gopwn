@@ -65,13 +65,7 @@ func newCaveCmd() *cobra.Command {
 			}
 
 			for _, cave := range caves {
-				fmt.Println("\n[+] CAVE DETECTED!")
-				fmt.Printf("[!] Section Name: %s\n", cave.SectionName)
-				fmt.Printf("[!] Section Flags: %s\n", cave.Infos)
-				fmt.Printf("[!] Virtual Address: %#x\n", cave.Addr)
-				fmt.Printf("[!] Cave Begin: %#x\n", cave.Begin)
-				fmt.Printf("[!] Cave End: %#x\n", cave.End)
-				fmt.Printf("[!] Cave Size: %#x (%d bytes)\n", cave.Size, cave.Size)
+				cave.Dump()
 			}
 
 			return nil

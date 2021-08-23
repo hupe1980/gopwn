@@ -7,8 +7,8 @@ package tube
 #include <libproc.h>
 
 const char* getwd(int p, char* cwd) {
-    pid_t pid;
-    struct proc_vnodepathinfo vpi;
+	pid_t pid;
+	struct proc_vnodepathinfo vpi;
 
 	pid = (pid_t) p;
 	proc_pidinfo(pid, PROC_PIDVNODEPATHINFO, 0, &vpi, sizeof(vpi));
