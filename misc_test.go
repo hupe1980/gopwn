@@ -46,8 +46,7 @@ func TestBase64D(t *testing.T) {
 
 func TestROT13(t *testing.T) {
 	s := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	r := ROT13(s)
-	assert.Equal(t, ROT13(s), r)
+	assert.Equal(t, s, ROT13(ROT13(s)))
 }
 
 func TestOpenFile(t *testing.T) {

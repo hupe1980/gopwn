@@ -60,16 +60,24 @@ assert.Equal(t, []byte("aaaabaaacaaadaaa"), gopwn.Cyclic(16)) // true
 assert.Equal(t, 4, gopwn.CyclicFind([]byte("baaa")) // true
 ```
 
-### Binary Manipulation
+### Binary Analysis and Manipulation
 ```go
 elf, _ := gopwn.NewELF("./ctfbinary")
+```
+
+```go
+pe, _ := gopwn.NewPE("./ctfbinary.exe")
+```
+
+```go
+macho, _ := gopwn.NewMACHO("./ctfbinary")
 ```
 
 ### Documentation
 See [godoc](https://pkg.go.dev/github.com/hupe1980/gopwn).
 
 ### Examples
-See more complete [examples](https://github.com/hupe1980/exploit-exercises/tree/main/exploits/go).
+See more complete [examples](https://github.com/hupe1980/gopwn/tree/main/_examples).
 
 ## CLI
 ```

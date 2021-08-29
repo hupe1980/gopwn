@@ -1,4 +1,4 @@
-// +build linux freebsd openbsd darwin solaris
+// +build linux darwin
 
 package tube
 

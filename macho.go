@@ -41,12 +41,31 @@ func (m *MACHO) Close() error {
 func (m *MACHO) Caves(caveSize int) []Cave {
 	var caves []Cave
 	for _, s := range m.file.Sections {
-		body, _ := s.Data()
-		caves = append(caves, searchCaves(fmt.Sprintf("%s.%s", s.Seg, s.Name), body, uint64(s.Offset), s.Addr, parseMACHOFlags(s.Flags), caveSize)...)
+		data, _ := s.Data()
+		caves = append(caves, searchCaves(fmt.Sprintf("%s.%s", s.Seg, s.Name), data, uint64(s.Offset), s.Addr, s.Size, parseMACHOFlags(s.Flags), caveSize)...)
 	}
 	return caves
 }
 
 func parseMACHOFlags(f uint32) string {
 	return "TODO"
+}
+
+func (m *MACHO) Strings(optFns ...func(o *StringsOptions)) []string {
+	options := StringsOptions{}
+	for _, fn := range optFns {
+		fn(&options)
+	}
+
+	var sections []dataReader
+	if len(options.Sections) > 0 {
+		for _, name := range options.Sections {
+			sections = append(sections, m.file.Section(name))
+		}
+	} else {
+		for _, s := range m.file.Sections {
+			sections = append(sections, s)
+		}
+	}
+	return parseStrings(sections)
 }

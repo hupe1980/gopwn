@@ -55,7 +55,7 @@ func NewELFFromReader(r BinaryReader) (*ELF, error) {
 	case elf.EM_AARCH64:
 		arch = ARCH_AARCH64
 	default:
-		return nil, fmt.Errorf("Unsupported machine type %x.", f.Machine)
+		return nil, fmt.Errorf("unsupported machine type %x", f.Machine)
 	}
 
 	var endian Endian
@@ -65,7 +65,7 @@ func NewELFFromReader(r BinaryReader) (*ELF, error) {
 	case elf.ELFDATA2MSB:
 		endian = BIG_ENDIAN
 	default:
-		return nil, fmt.Errorf("Unknown endianness %x.", f.Data)
+		return nil, fmt.Errorf("unknown endianness %x", f.Data)
 	}
 
 	if _, err := r.Seek(0, io.SeekStart); err != nil {
@@ -107,7 +107,7 @@ func NewELFFromReader(r BinaryReader) (*ELF, error) {
 						return addr - p.Vaddr + p.Off, nil
 					}
 				}
-				return 0, fmt.Errorf("Address %x is not in range of an ELF segment", addr)
+				return 0, fmt.Errorf("address %x is not in range of an ELF segment", addr)
 			},
 		},
 	}, nil
@@ -252,8 +252,27 @@ func (e *ELF) DumpHeader(hdr interface{}) {
 func (e *ELF) Caves(caveSize int) []Cave {
 	var caves []Cave
 	for _, s := range e.file.Sections {
-		body, _ := s.Data()
-		caves = append(caves, searchCaves(s.Name, body, s.Offset, s.Addr, s.Flags.String(), caveSize)...)
+		data, _ := s.Data()
+		caves = append(caves, searchCaves(s.Name, data, s.Offset, s.Addr, s.Size, s.Flags.String(), caveSize)...)
 	}
 	return caves
+}
+
+func (e *ELF) Strings(optFns ...func(o *StringsOptions)) []string {
+	options := StringsOptions{}
+	for _, fn := range optFns {
+		fn(&options)
+	}
+
+	var sections []dataReader
+	if len(options.Sections) > 0 {
+		for _, name := range options.Sections {
+			sections = append(sections, e.file.Section(name))
+		}
+	} else {
+		for _, s := range e.file.Sections {
+			sections = append(sections, s)
+		}
+	}
+	return parseStrings(sections)
 }

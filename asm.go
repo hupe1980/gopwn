@@ -26,7 +26,7 @@ func NewAssembler(arch Arch) (*Assembler, error) {
 	case ARCH_ARM:
 		ks, err = keystone.New(keystone.ARCH_ARM, keystone.MODE_32)
 	default:
-		return nil, errors.New("Unsupported machine type.")
+		return nil, errors.New("unsupported machine type")
 	}
 
 	if err != nil {
@@ -43,7 +43,7 @@ func NewAssembler(arch Arch) (*Assembler, error) {
 func (a *Assembler) Assemble(assembly string) ([]byte, error) {
 	insn, _, ok := a.ks.Assemble(assembly, 0)
 	if !ok {
-		return nil, errors.New("Could not assemble instruction")
+		return nil, errors.New("could not assemble instruction")
 	}
 	return insn, nil
 }

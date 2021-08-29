@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 )
 
 type BinaryReader interface {
@@ -48,17 +49,21 @@ func (f *fileBytes) Save(filePath string, fileMode os.FileMode) error {
 }
 
 type Cave struct {
-	SectionName string
-	Begin       int
-	End         int
-	Size        int
-	Addr        int
-	Infos       string
+	SectionName   string
+	SectionOffset uint64
+	SectionSize   uint64
+	Begin         int
+	End           int
+	Size          int
+	Addr          int
+	Infos         string
 }
 
 func (c *Cave) Dump() {
 	fmt.Println("\n[+] CAVE DETECTED!")
 	fmt.Printf("[!] Section Name: %s\n", c.SectionName)
+	fmt.Printf("[!] Section Offset: %#x\n", c.SectionOffset)
+	fmt.Printf("[!] Section Size: %#x (%d bytes)\n", c.SectionSize, int(c.SectionSize))
 	fmt.Printf("[!] Section Flags: %s\n", c.Infos)
 	fmt.Printf("[!] Virtual Address: %#x\n", c.Addr)
 	fmt.Printf("[!] Cave Begin: %#x\n", c.Begin)
@@ -66,27 +71,77 @@ func (c *Cave) Dump() {
 	fmt.Printf("[!] Cave Size: %#x (%d bytes)\n", c.Size, c.Size)
 }
 
-func searchCaves(name string, body []byte, offset, addr uint64, infos string, caveSize int) []Cave {
+func searchCaves(name string, data []byte, offset, addr, size uint64, infos string, caveSize int) []Cave {
 	caveBytes := []byte("\x00")
 	var caves []Cave
 	caveCount := 0
-	for currentOffset := 0; currentOffset < len(body); currentOffset++ {
-		currentByte := body[currentOffset]
+	for currentOffset := 0; currentOffset < len(data); currentOffset++ {
+		currentByte := data[currentOffset]
 		if bytes.Contains([]byte{currentByte}, caveBytes) {
 			caveCount++
 		} else {
 			if caveCount >= caveSize {
 				caves = append(caves, Cave{
-					SectionName: name,
-					Size:        caveCount,
-					Addr:        int(addr) + currentOffset - caveCount,
-					Begin:       int(offset) + currentOffset - caveCount,
-					End:         int(offset) + currentOffset,
-					Infos:       infos,
+					SectionName:   name,
+					SectionOffset: offset,
+					SectionSize:   size,
+					Size:          caveCount,
+					Addr:          int(addr) + currentOffset - caveCount,
+					Begin:         int(offset) + currentOffset - caveCount,
+					End:           int(offset) + currentOffset,
+					Infos:         infos,
 				})
 			}
 			caveCount = 0
 		}
 	}
 	return caves
+}
+
+type dataReader interface {
+	Data() ([]byte, error)
+}
+
+type StringsOptions struct {
+	Min      int
+	Max      int
+	Regex    func(min, max int) *regexp.Regexp
+	Sections []string
+}
+
+func parseStrings(sections []dataReader, optFns ...func(o *StringsOptions)) []string {
+	options := StringsOptions{
+		Min: 4,
+		Max: 100,
+		Regex: func(min, max int) *regexp.Regexp {
+			return regexp.MustCompile(fmt.Sprintf("([\x20-\x7E]{%d}[\x20-\x7E]*)", min))
+		},
+	}
+	for _, fn := range optFns {
+		fn(&options)
+	}
+
+	validString := options.Regex(options.Min, options.Max)
+
+	var strs []string
+	for _, s := range sections {
+		b, err := s.Data()
+		if err != nil {
+			continue
+		}
+		var slice [][]byte
+		if slice = bytes.Split(b, []byte("\x00")); slice == nil {
+			return nil
+		}
+		for _, b := range slice {
+			if len(b) == 0 || len(b) > options.Max {
+				continue
+			}
+			str := string(b)
+			if validString.MatchString(str) {
+				strs = append(strs, str)
+			}
+		}
+	}
+	return strs
 }
