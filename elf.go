@@ -203,11 +203,11 @@ func (e *ELF) Close() error {
 	return e.file.Close()
 }
 
-func (e *ELF) DumpHeader(hdr interface{}) {
+func (e *ELF) DumpHeader() {
 	fmt.Println("-------------------------- Elf Header ------------------------")
 	switch e.file.Class {
 	case elf.ELFCLASS64:
-		h := e.hdr.(elf.Header64)
+		h := e.hdr.(*elf.Header64)
 		fmt.Printf("Magic: % x\n", h.Ident)
 		fmt.Printf("Class: %s\n", elf.Class(h.Ident[elf.EI_CLASS]))
 		fmt.Printf("Data: %s\n", elf.Data(h.Ident[elf.EI_DATA]))
@@ -227,7 +227,7 @@ func (e *ELF) DumpHeader(hdr interface{}) {
 		fmt.Printf("Number of Section Header Entries: %d\n", h.Shnum)
 		fmt.Printf("Index of Section Header string table: %d\n", h.Shstrndx)
 	case elf.ELFCLASS32:
-		h := e.hdr.(elf.Header32)
+		h := e.hdr.(*elf.Header32)
 		fmt.Printf("Magic: % x\n", h.Ident)
 		fmt.Printf("Class: %s\n", elf.Class(h.Ident[elf.EI_CLASS]))
 		fmt.Printf("Data: %s\n", elf.Data(h.Ident[elf.EI_DATA]))

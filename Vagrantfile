@@ -70,12 +70,24 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision "shell", inline: <<-SHELL
+  $script = <<-'SCRIPT'
     add-apt-repository ppa:longsleep/golang-backports
     apt-get update && apt-get upgrade -y
-    apt-get install golang-go make cmake gcc gcc-multilib g++-multilib gdb checksec -y
+    apt-get install golang-go make cmake gcc gcc-multilib g++-multilib \
+        gdb checksec git python2 python3 python3-pip \
+        python3-dev libssl-dev libffi-dev build-essential -y
+
+    python3 -m pip install -q --upgrade pip
+    python3 -m pip install -q --upgrade pwntools
 
     /home/vagrant/gopwn/scripts/install_capstone.sh
     /home/vagrant/gopwn/scripts/install_keystone.sh
-  SHELL
+
+    git clone -q https://github.com/longld/peda.git /opt/peda
+    echo "# gdb extensions:" >> /home/vagrant/.bashrc
+    echo "alias peda=\"gdb -iex 'source /opt/peda/peda.py' --nh -q\"" >> /home/vagrant/.bashrc
+
+  SCRIPT
+  
+  config.vm.provision "shell", inline: $script
 end

@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+
+	"github.com/ianlancetaylor/demangle"
 )
 
 type BinaryReader interface {
@@ -107,12 +109,14 @@ type StringsOptions struct {
 	Max      int
 	Regex    func(min, max int) *regexp.Regexp
 	Sections []string
+	Demangle bool
 }
 
 func parseStrings(sections []dataReader, optFns ...func(o *StringsOptions)) []string {
 	options := StringsOptions{
-		Min: 4,
-		Max: 100,
+		Min:      4,
+		Max:      100,
+		Demangle: false,
 		Regex: func(min, max int) *regexp.Regexp {
 			return regexp.MustCompile(fmt.Sprintf("([\x20-\x7E]{%d}[\x20-\x7E]*)", min))
 		},
@@ -139,6 +143,9 @@ func parseStrings(sections []dataReader, optFns ...func(o *StringsOptions)) []st
 			}
 			str := string(b)
 			if validString.MatchString(str) {
+				if options.Demangle {
+					str = demangle.Filter(str)
+				}
 				strs = append(strs, str)
 			}
 		}

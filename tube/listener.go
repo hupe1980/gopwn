@@ -23,9 +23,8 @@ func (l *Listener) WaitForConnection() error {
 		return err
 	}
 	l.tube = tube{
-		stdin:  c,
-		stdout: c,
-		stderr: c,
+		in:  c,
+		out: c,
 	}
 	return nil
 }

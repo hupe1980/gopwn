@@ -1,6 +1,7 @@
 package tube
 
 import (
+	"io"
 	"os"
 	"os/exec"
 )
@@ -28,15 +29,15 @@ func NewProcess(argv []string, optFns ...func(o *ProcessOptions)) (*Process, err
 	cmd.Env = append(os.Environ(), options.Env...)
 	cmd.Dir = options.Dir
 
-	stdin, err := cmd.StdinPipe()
+	in, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, err
 	}
-	stdout, err := cmd.StdoutPipe()
+	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
 	}
-	stderr, err := cmd.StderrPipe()
+	stdErr, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, err
 	}
@@ -47,9 +48,8 @@ func NewProcess(argv []string, optFns ...func(o *ProcessOptions)) (*Process, err
 	return &Process{
 		cmd: cmd,
 		tube: tube{
-			stdin:   stdin,
-			stdout:  stdout,
-			stderr:  stderr,
+			in:      in,
+			out:     io.NopCloser(io.MultiReader(stdOut, stdErr)),
 			newLine: options.NewLine,
 		},
 	}, nil

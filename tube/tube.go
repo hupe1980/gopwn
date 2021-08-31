@@ -9,9 +9,8 @@ import (
 )
 
 type tube struct {
-	stdin   io.WriteCloser
-	stdout  io.ReadCloser
-	stderr  io.ReadCloser
+	in      io.WriteCloser
+	out     io.ReadCloser
 	newLine byte
 }
 
@@ -19,13 +18,13 @@ type tube struct {
 func (t *tube) SendLine(input interface{}) (int, error) {
 	b := Bytes(input)
 	b = append(b, t.NewLine())
-	return t.stdin.Write(b)
+	return t.in.Write(b)
 }
 
 // RecvN receives a specified number of bytes
 func (t *tube) RecvN(n int) ([]byte, error) {
 	b := make([]byte, n)
-	rn, err := t.stdout.Read(b)
+	rn, err := t.out.Read(b)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +39,7 @@ func (t *tube) RecvUntil(needle []byte, drop bool) ([]byte, error) {
 // RecvUntilWithContext receives data until the specified sequence of bytes is detected or the context is done.
 func (t *tube) RecvUntilWithContext(ctx context.Context, needle []byte, drop bool) ([]byte, error) {
 	data := make([]byte, len(needle))
-	b := bufio.NewReader(t.stdout)
+	b := bufio.NewReader(t.out)
 
 	_, err := io.ReadFull(b, data)
 	if err != nil {

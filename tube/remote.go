@@ -15,9 +15,8 @@ func NewRemote(network, addr string) (*Remote, error) {
 	return &Remote{
 		conn: c,
 		tube: tube{
-			stdin:  c,
-			stdout: c,
-			stderr: c,
+			in:  c,
+			out: c,
 		},
 	}, nil
 }
